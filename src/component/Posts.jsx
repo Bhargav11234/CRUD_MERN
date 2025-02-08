@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { getPost } from "../api/Postapi";
+import {deletPost, getPost } from "../api/Postapi";
 import "../App.css"
 
 export const Posts = () => {  
-  const [data, setData] = useState([]); 
+  const [data, setData] = useState([]);
+  const [updateDataApi, setUpdateDataApi] = useState({}); 
 
   const getPostdata = async () => {
     try {
@@ -14,6 +15,25 @@ export const Posts = () => {
       console.error("Error fetching posts:", error);
     }
   };
+
+  // To delet the data 
+  const handleDeletePost = async (id) => {
+    try {
+      const res = await deletPost(id);
+      if (res.status === 200) {
+        const newUpdatedPosts = data.filter((curPost) => {
+          return curPost.id !== id;
+        });
+        setData(newUpdatedPosts);
+      } else {
+        console.log("Failed to delete the post:", res.status);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    
+  };
+
 
   useEffect(() => {
     getPostdata();
@@ -30,7 +50,7 @@ export const Posts = () => {
                 <p>Title: {title}</p>
                 <p>Body: {body}</p>
                 <button>Edit</button>
-                <button>Delete</button>
+                <button onClick={()=> handleDeletePost(id)}>Delete</button>
               </li>
             );
           })}
